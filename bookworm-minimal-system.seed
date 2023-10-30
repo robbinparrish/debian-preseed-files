@@ -1,0 +1,92 @@
+#
+# Minimal system install pressed file.
+#
+d-i debian-installer/locale string en_US.UTF-8
+d-i debian-installer/language string en
+d-i debian-installer/country string IN
+d-i keyboard-configuration/xkb-keymap select us
+d-i netcfg/choose_interface select auto
+d-i netcfg/get_hostname string minimal-system-install
+d-i netcfg/wireless_wep string
+d-i hw-detect/load_firmware boolean true
+d-i mirror/country string manual
+d-i mirror/http/hostname string http.us.debian.org
+d-i mirror/http/directory string /debian
+d-i mirror/http/proxy string
+# echo "password" | mkpasswd -s -m sha512crypt
+d-i passwd/root-password-crypted password $6$Fk8tzypLnN9YX3aW$9dDZ7lWJDnHqaNMxMgZSrFFGrqFEQkGIXJOpQj/QFQjtBqNr2eIs4Cj1GWjuAkAGjjLBs3ArK4BSKV3aukaab.
+d-i passwd/user-fullname string System Administrator
+d-i passwd/username string administrator
+# echo "password" | mkpasswd -s -m sha512crypt
+d-i passwd/user-password-crypted password $6$Fk8tzypLnN9YX3aW$9dDZ7lWJDnHqaNMxMgZSrFFGrqFEQkGIXJOpQj/QFQjtBqNr2eIs4Cj1GWjuAkAGjjLBs3ArK4BSKV3aukaab.
+d-i passwd/user-default-groups string sudo cdrom video audio
+d-i clock-setup/utc boolean true
+d-i time/zone string Asia/Kolkata
+d-i clock-setup/ntp boolean true
+d-i partman-lvm/device_remove_lvm boolean true
+d-i partman-md/device_remove_md boolean true
+d-i partman-auto/method string regular
+d-i partman-auto/expert_recipe string                         \
+      disk-partitioning ::                                    \
+              512 0 512 free                                  \
+                      $iflabel{ gpt }                         \
+                      $reusemethod{ }                         \
+                      method{ efi }                           \
+                      format{ }                               \
+              .                                               \
+              1024 0 1024 ext4                                \
+                      $primary{ } $bootable{ }                \
+                      method{ format } format{ }              \
+                      use_filesystem{ } filesystem{ ext4 }    \
+                      mountpoint{ /boot }                     \
+              .                                               \
+              16384 0 16384 linux-swap                        \
+                      method{ swap } format{ }                \
+              .                                               \
+              131072 0 131072 ext4                            \
+                      method{ format } format{ }              \
+                      use_filesystem{ } filesystem{ ext4 }    \
+                      mountpoint{ / }                         \
+              .                                               \
+              12288 0 12288 ext4                              \
+                      method{ format } format{ }              \
+                      use_filesystem{ } filesystem{ ext4 }    \
+                      mountpoint{ /var/log }                  \
+              .                                               \
+              32768 0 4194304 ext4                            \
+                      method{ format } format{ }              \
+                      use_filesystem{ } filesystem{ ext4 }    \
+                      mountpoint{ /userdata }                 \
+              .
+d-i partman-auto/choose_recipe select disk-partitioning
+d-i partman-partitioning/confirm_write_new_label boolean true
+d-i partman/choose_partition select finish
+d-i partman/confirm boolean true
+d-i partman/confirm_nooverwrite boolean true
+d-i partman-efi/non_efi_system boolean true
+d-i partman-partitioning/choose_label select gpt
+d-i partman-partitioning/default_label string gpt
+d-i partman/mount_style select uuid
+d-i apt-setup/disable-cdrom-entries boolean true
+d-i grub-installer/only_debian boolean true
+d-i grub-installer/bootdev string default
+d-i apt-setup/cdrom/set-first boolean false
+d-i apt-setup/use_mirror boolean false
+d-i apt-setup/services-select multiselect security, updates
+d-i apt-setup/security_host string security.debian.org
+tasksel tasksel/first multiselect standard
+d-i pkgsel/include string sudo net-tools procps ufw vim \
+	wget curl apparmor apparmor-profiles apparmor-utils openssl ca-certificates \
+	network-manager ethtool
+popularity-contest popularity-contest/participate boolean false
+d-i apt-setup/non-free boolean true
+d-i apt-setup/contrib boolean true
+d-i grub-installer/with_other_os boolean false
+d-i finish-install/reboot_in_progress note
+d-i cdrom-detect/eject boolean false
+d-i debian-installer/exit/poweroff boolean true
+#
+# Run some post-install script.
+# d-i preseed/late_command string in-target wget http://SERVER_ADDR/system-setup-tools/default-system-setup.sh ; \
+#	in-target /bin/bash default-system-setup.sh ; \
+#
